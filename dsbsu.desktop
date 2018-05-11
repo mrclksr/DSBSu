@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=DSBSu
+Exec=dsbsu
+Icon=gtk-dialog-authentication
+Terminal=false
+StartupNotify=false
+Type=Application
+Categories=System;Utility;Application
