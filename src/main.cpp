@@ -98,8 +98,9 @@ main(int argc, char *argv[])
 				    dsbsu_strerror());
 			}
 		}
-		return (0);
+		return (EXIT_SUCCESS);
 	}
+	return (EXIT_FAILURE);
 }
 
 static void
