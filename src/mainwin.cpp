@@ -97,7 +97,8 @@ MainWin::callBackend()
 {
 	const char *pass;
 
-	pass = pwdField->text().toLatin1();
+	pass = pwdField->text().toUtf8().constData();
+
 	if ((proc = dsbsu_exec_su(cmd, usr, pass)) == NULL) {
 		if (dsbsu_error() == DSBSU_EAUTH) {
 			pwdField->clear();
