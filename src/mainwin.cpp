@@ -23,6 +23,7 @@
  */
 
 #include <QDesktopWidget>
+#include <QTextCodec>
 
 #include "mainwin.h"
 #include "qt-helper/qt-helper.h"
@@ -95,11 +96,10 @@ MainWin::resetStatusBar(const QString & /*unused*/)
 void
 MainWin::callBackend()
 {
-	const char *pass;
+	QTextCodec *codec = QTextCodec::codecForLocale();
+	QByteArray encstr = codec->fromUnicode(pwdField->text());
 
-	pass = pwdField->text().toUtf8().constData();
-
-	if ((proc = dsbsu_exec_su(cmd, usr, pass)) == NULL) {
+	if ((proc = dsbsu_exec_su(cmd, usr, encstr.data())) == NULL) {
 		if (dsbsu_error() == DSBSU_EAUTH) {
 			pwdField->clear();
 			statusMsg->setText(tr("Wrong password"));
