@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <err.h>
 
 #include "qt-helper/qt-helper.h"
 #include "mainwin.h"
