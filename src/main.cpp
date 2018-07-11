@@ -62,11 +62,22 @@ main(int argc, char *argv[])
 	if (translator.load(QLocale(), QLatin1String(PROGRAM),
 	    QLatin1String("_"), QLatin1String(LOCALE_PATH)))
 		app.installTranslator(&translator);
+	if (getuid() == 0 || geteuid() == 0)
+		qh_errx(NULL, EXIT_FAILURE, "Refusing to run as root");
 	if (!dsbsu_validate_user(user)) {
 		if (dsbsu_error() == DSBSU_ENOUSER)
 			qh_errx(NULL, EXIT_FAILURE,
 			    QObject::tr("No such user %1").arg(user));
 		qh_errx(NULL, EXIT_FAILURE, "%s", dsbsu_strerror());
+	}
+	if (dsbsu_is_me(user)) {
+		switch (system(cmd)) {
+		case  -1:
+			qh_err(NULL, EXIT_FAILURE, "system(%s)", cmd);
+		case 127:
+			qh_errx(NULL, EXIT_FAILURE, "Failed to execute shell.");
+		}
+		return (EXIT_SUCCESS);
 	}
 	MainWin w(msg, user, cmd);
 
