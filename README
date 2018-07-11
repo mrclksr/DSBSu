@@ -13,7 +13,8 @@ INSTALLATION
      # git clone https://github.com/mrclksr/DSBSu.git
 
    Building and installation
-     # cd DSBSu && qmake # make && make install
+     # cd DSBSu && qmake
+     # make && make install
 
 USAGE
      Usage: dsbsu [-m message] [-u user] command
