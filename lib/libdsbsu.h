@@ -41,6 +41,7 @@ __BEGIN_DECLS
 extern int	  dsbsu_error(void);
 extern int	  dsbsu_wait(dsbsu_proc *);
 extern bool	  dsbsu_validate_user(const char *);
+extern bool	  dsbsu_is_me(const char *);
 extern dsbsu_proc *dsbsu_exec_su(const char *, const char *, const char *);
 extern const char *dsbsu_strerror(void);
 __END_DECLS

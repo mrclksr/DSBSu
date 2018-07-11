@@ -110,6 +110,20 @@ dsbsu_validate_user(const char *user)
 	return (true);
 }
 
+bool
+dsbsu_is_me(const char *user)
+{
+	struct passwd *pw;
+
+	if (user == NULL)
+		user = "root";
+	errno = 0;
+	pw = getpwuid(getuid()); endpwent();
+	if (strcmp(user, pw->pw_name) == 0)
+		return (true);
+	return (false);
+}
+
 dsbsu_proc *
 dsbsu_exec_su(const char *cmd, const char *user, const char *pass)
 {
