@@ -1,0 +1,28 @@
+.Dd $Mdocdate$
+.Dt DSBSu
+.Sh ABOUT
+.Nm DSBSu
+is a Qt frontend to su(1).
+.Sh INSTALLATION
+.Ss Dependencies
+.Nm
+depends on
+.Em devel/qt5-buildtools , devel/qt5-core , devel/qt5-linguisttools ,
+.Em devel/qt5-qmake , x11-toolkits/qt5-gui ,
+and
+.Em x11-toolkits/qt5-widgets
+
+.Ss Getting the source code
+.Bd -literal
+# git clone https://github.com/mrclksr/DSBSu.git
+.Ss Building and installation
+# cd DSBSu && qmake
+# make && make install
+.Ed
+.Sh USAGE
+.Bd -literal
+Usage: dsbsu [-mu] command
+   -m: Message text
+   -u: Username. Default is root.
+.Ed
+
