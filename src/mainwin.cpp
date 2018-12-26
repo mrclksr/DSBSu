@@ -33,8 +33,14 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
 	this->cmd = cmd;
 	this->usr = usr;
 
-	QString prompt	    = QString(tr("Please enter %1's password:")).
-				      arg(usr == 0 ? "root" : usr);
+	QString pstring;
+	QString ustr = QString(usr == 0 ? "root" : usr);
+
+	if (ustr[ustr.length() - 1] == 's')
+		pstring = QString(tr("Please enter %1' password:"));
+	else
+		pstring = QString(tr("Please enter %1's password:"));
+	QString prompt	    = pstring.arg(ustr);
 	QIcon okIcon	    = qh_loadStockIcon(QStyle::SP_DialogOkButton, 0);
 	QIcon cancelIcon    = qh_loadStockIcon(QStyle::SP_DialogCancelButton,
 					       NULL);
@@ -43,8 +49,7 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
 	statusMsg	    = new QLabel(this);
 	statusBar	    = new QStatusBar(this);
 	QLabel	    *icon   = new QLabel(this);	      
-	QLabel	    *text   = new QLabel(QString(msg).append("\n"));
-
+	QLabel	    *text;
 	QLabel	    *label  = new QLabel(prompt);
 	QPushButton *ok	    = new QPushButton(okIcon, tr("&Ok"));
 	QPushButton *cancel = new QPushButton(cancelIcon, tr("&Cancel"));
@@ -53,6 +58,11 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
 	QHBoxLayout *hbox   = new QHBoxLayout;
 	QWidget *container  = new QWidget(this);
 
+	if (msg == 0 || *msg == '\0') {
+		text = new QLabel(QString(tr("Execute '%1' as user %2\n")
+				  .arg(QString(cmd)).arg(ustr)));
+	} else
+		text = new QLabel(QString(msg).append("\n"));
 	icon->setPixmap(pic.pixmap(64));
 	text->setWordWrap(true);
 	pwdField->setEchoMode(QLineEdit::Password);
@@ -119,7 +129,7 @@ MainWin::cbCancel()
 	QCoreApplication::exit(-1);
 }
 
-void MainWin::closeEvent(QCloseEvent */* unused */)
+void MainWin::closeEvent(QCloseEvent * /* unused */)
 {
 	QCoreApplication::exit(-1);
 }
