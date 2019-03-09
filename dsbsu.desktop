@@ -5,4 +5,5 @@ Icon=gtk-dialog-authentication
 Terminal=false
 StartupNotify=false
 Type=Application
+NoDisplay=true
 Categories=System;Utility;Application
