@@ -17,7 +17,7 @@ TEMPLATE     = app
 QT	    += widgets
 INCLUDEPATH += . lib src
 DEFINES     += PROGRAM=\\\"$${PROGRAM}\\\" LOCALE_PATH=\\\"$${DATADIR}\\\"
-LIBS	    += -lcrypt -lutil
+LIBS	    += -lutil
 QMAKE_POST_LINK = $(STRIP) $(TARGET)
 QMAKE_EXTRA_TARGETS += distclean cleanqm readme readmemd
 
