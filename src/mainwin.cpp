@@ -68,6 +68,8 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
 	pwdField->setEchoMode(QLineEdit::Password);
 	statusBar->addWidget(statusMsg);
 	label->setStyleSheet("font-weight: bold;");
+	ok->setDefault(true);
+	cancel->setDefault(true);
 
 	bbox->addWidget(ok,     1, Qt::AlignRight);
         bbox->addWidget(cancel, 0, Qt::AlignRight);
