@@ -6,4 +6,4 @@ Terminal=false
 StartupNotify=false
 Type=Application
 NoDisplay=true
-Categories=System;Utility;Application
+Categories=System;Security;
