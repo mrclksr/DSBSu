@@ -464,7 +464,7 @@ init_tty(dsbsu_proc *proc)
 		ERROR(-1, FATAL_SYSERR, false, "tcgetattr()");
 	proc->term = t; cfmakeraw(&t);
 	if (tcsetattr(fileno(stdin), TCSAFLUSH, &t) == -1 ||
-	    tcsetattr(proc->master, TCSAFLUSH, &t) == -1)
+	    tcsetattr(proc->master, TCSAFLUSH, &proc->term) == -1)
 		ERROR(-1, FATAL_SYSERR, false, "tcsetattr()");
 	proc->ttymod = true;
 
