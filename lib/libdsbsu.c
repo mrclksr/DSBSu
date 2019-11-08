@@ -147,13 +147,13 @@ dsbsu_exec_su(const char *cmd, const char *user, const char *pass)
 
 	/*
 	 * We can tell whether authentication failed, but not
-	 * if it was successful. Prepend an "echo" that outputs
+	 * if it was successful. Prepend an "/bin/echo" that outputs
 	 * a string to indicate success.
 	 */
 	if ((cmdbuf = malloc(strlen(cmd) +
-	    sizeof(AUTHMSG_SUCCESS) + strlen("echo \"\";"))) == NULL)
+	    sizeof(AUTHMSG_SUCCESS) + strlen("/bin/echo \"\";"))) == NULL)
 		ERROR(NULL, FATAL_SYSERR, false, "malloc()");
-	(void)sprintf(cmdbuf, "echo \"%s\";%s", AUTHMSG_SUCCESS, cmd);
+	(void)sprintf(cmdbuf, "/bin/echo \"%s\";%s", AUTHMSG_SUCCESS, cmd);
 
 	(void)sigemptyset(&sset);
         (void)sigaddset(&sset, SIGCHLD);
