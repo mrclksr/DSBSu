@@ -38,7 +38,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/sysctl.h>
 #include <sys/un.h>
 #include <sys/wait.h>
 #include <pwd.h>
@@ -49,8 +48,8 @@
 
 #define PATH_SU		"/usr/bin/su"
 #define AUTHMSG_FAIL	"su: Sorry"
-#define AUTHMSG_SUCCESS	"4a6e03e670e39ebe649fbfdb64bb14e0"
 #define SUPROMPT	"Password:"
+#define AUTHMSG_SUCCESS	"4a6e03e670e39ebe649fbfdb64bb14e0"
 #define SUMAXREBUFSZ	((sizeof(SUPROMPT) + sizeof(AUTHMSG_FAIL)) * 2 + 1024)
 #define ERRBUFSZ	1024
 #define FATAL_SYSERR	(DSBSU_ERR_SYS | DSBSU_ERR_FATAL)
@@ -61,10 +60,11 @@
 } while (0)
 
 struct dsbsu_proc_s {
-	int	 pid;
+	int	 fdstdout;   /* The process' stdout. */
 	int	 fdstdin;    /* The process' stdin. */
 	int	 master;     /* Master fd of pty */
 	bool	 ttymod;     /* Whether tty on stdin was modified. */
+	pid_t	 pid;	     /* PID of process. */
 	sigset_t sset;	     /* Saved signal set. */
 	struct termios term; /* Saved settings of current tty. */
 };
@@ -72,7 +72,7 @@ struct dsbsu_proc_s {
 static int     send_eof(int);
 static int     init_tty(dsbsu_proc *);
 static int     reset_tty(dsbsu_proc *);
-static int     send_pass(int, const char *, const char *);
+static int     send_pass(dsbsu_proc *, const char *, const char *);
 static int     wait_on_proc(dsbsu_proc *, bool);
 static void    set_error(int, bool, const char *, ...);
 static ssize_t _write(int, const void *, size_t);
@@ -127,15 +127,16 @@ dsbsu_is_me(const char *user)
 dsbsu_proc *
 dsbsu_exec_su(const char *cmd, const char *user, const char *pass)
 {
-	int	   c, n, slave, sv[2], ptest[2];
-	char	   *cmdbuf;
-	bool	   ispipe, retignore;
-	sigset_t   sset;
-	dsbsu_proc *proc;
+	int	      c, n, slave, stdin_sv[2], stdout_sv[2], ptest[2];
+	char	      *cmdbuf;
+	bool	      stdin_ispipe, stdout_ispipe, retignore;
+	sigset_t      sset;
+	dsbsu_proc    *proc;
 	struct winsize wsz, *wszp;
 
 	retignore = false;
-	slave = sv[0] = sv[1] = ptest[0] = ptest[1] = -1;
+	slave = stdin_sv[0] = stdin_sv[1] = ptest[0] = ptest[1] = -1;
+	stdout_sv[0] = stdout_sv[1] = -1;
 
 	if (user == NULL)
 		user = "root";
@@ -143,7 +144,8 @@ dsbsu_exec_su(const char *cmd, const char *user, const char *pass)
 		return (NULL);
 	if ((proc = malloc(sizeof(dsbsu_proc))) == NULL)
 		ERROR(NULL, FATAL_SYSERR, false, "malloc()");
-	proc->pid = proc->master = proc->fdstdin = -1; proc->ttymod = false;
+	proc->pid = proc->master = proc->fdstdin = proc->fdstdout = -1;
+	proc->ttymod = false;
 
 	/*
 	 * We can tell whether authentication failed, but not
@@ -154,7 +156,6 @@ dsbsu_exec_su(const char *cmd, const char *user, const char *pass)
 	    sizeof(AUTHMSG_SUCCESS) + strlen("/bin/echo \"\";"))) == NULL)
 		ERROR(NULL, FATAL_SYSERR, false, "malloc()");
 	(void)sprintf(cmdbuf, "/bin/echo \"%s\";%s", AUTHMSG_SUCCESS, cmd);
-
 	(void)sigemptyset(&sset);
         (void)sigaddset(&sset, SIGCHLD);
 	(void)sigprocmask(SIG_BLOCK, &sset, &proc->sset);
@@ -176,29 +177,47 @@ dsbsu_exec_su(const char *cmd, const char *user, const char *pass)
 		set_error(FATAL_SYSERR, false, "socketpair()");
 		goto error;
 	}
-	if (!isatty(fileno(stdin))) {
+
+	stdin_ispipe = false;
+	proc->fdstdin = proc->master;
+
+	stdout_ispipe = false;
+	proc->fdstdout = fileno(stdout);
+
+	if (!isatty(fileno(stdout)) || !isatty(fileno(stdin))) {
+		if (!isatty(fileno(stdout))) {
+			if (socketpair(AF_LOCAL,
+			    SOCK_STREAM | SOCK_CLOEXEC, 0, stdout_sv) == -1) {
+				set_error(FATAL_SYSERR, false, "socketpair()");
+				goto error;
+			}
+			stdout_ispipe = true;
+			proc->fdstdout = stdout_sv[0];
+		}
 		if (socketpair(AF_LOCAL,
-		    SOCK_STREAM | SOCK_CLOEXEC, 0, sv) == -1) {
+		    SOCK_STREAM | SOCK_CLOEXEC, 0, stdin_sv) == -1) {
 			set_error(FATAL_SYSERR, false, "socketpair()");
 			goto error;
 		}
-		ispipe = true;
-		proc->fdstdin = sv[0];
-	} else {
-		ispipe = false;
-		proc->fdstdin = proc->master;
+		stdin_ispipe = true;
+		proc->fdstdin = stdin_sv[0];
 	}
 	if ((proc->pid = fork()) == -1) {
 		set_error(FATAL_SYSERR, false, "fork()");
 		goto error;
 	} else if (proc->pid == 0) {
-		(void)close(sv[0]);
+		(void)close(stdin_sv[0]);
+		(void)close(stdout_sv[0]);
 		(void)close(ptest[0]);
 		(void)close(proc->master);
 		if (login_tty(slave) == -1)
 			_exit(DSBSU_ERR_SYS + errno);
-		if (ispipe) {
-			if (dup2(sv[1], fileno(stdin)) == -1)
+		if (stdin_ispipe) {
+			if (dup2(stdin_sv[1], fileno(stdin)) == -1)
+				_exit(DSBSU_ERR_SYS + errno);
+		}
+		if (stdout_ispipe) {
+			if (dup2(stdout_sv[1], fileno(stdout)) == -1)
 				_exit(DSBSU_ERR_SYS + errno);
 		}
 		(void)sigprocmask(SIG_SETMASK, &proc->sset, NULL);
@@ -206,7 +225,8 @@ dsbsu_exec_su(const char *cmd, const char *user, const char *pass)
 		    cmdbuf, NULL);
 		_exit(DSBSU_EEXECSU + errno);
 	} else {
-		(void)close(sv[1]);
+		(void)close(stdin_sv[1]);
+		(void)close(stdout_sv[1]);
 		(void)close(slave);
 		(void)close(ptest[1]);
 		free(cmdbuf); cmdbuf = NULL;
@@ -215,7 +235,7 @@ dsbsu_exec_su(const char *cmd, const char *user, const char *pass)
 	if (_read(ptest[0], &c, 1) == -1)
 		goto error;
 	(void)close(ptest[0]);
-	if ((n = send_pass(proc->master, SUPROMPT, pass)) == 0)
+	if ((n = send_pass(proc, SUPROMPT, pass)) == 0)
 		return (proc);
 	if (n != -1)
 		retignore = true;
@@ -223,8 +243,10 @@ error:
 	free(cmdbuf);
 	(void)close(slave);
 	(void)close(proc->master);
-	(void)close(sv[0]);
-	(void)close(sv[1]);
+	(void)close(stdin_sv[0]);
+	(void)close(stdin_sv[1]);
+	(void)close(stdout_sv[0]);
+	(void)close(stdout_sv[1]);
 	(void)close(ptest[0]);
 	(void)close(ptest[1]);
 	(void)reset_tty(proc);
@@ -250,11 +272,12 @@ dsbsu_wait(dsbsu_proc *proc)
 
 	bufsz = sizeof(buf) - 1;
 	maxfd = proc->master > fileno(stdin) ? proc->master : fileno(stdin);
-
+	maxfd = maxfd > proc->fdstdout ? maxfd : proc->fdstdout;
 	FD_ZERO(&allset);
 	FD_SET(proc->master, &allset);
 	FD_SET(fileno(stdin), &allset);
-
+	if (proc->fdstdout != fileno(stdout))
+		FD_SET(proc->fdstdout, &allset);
 	ign.sa_flags   = 0;
 	ign.sa_handler = SIG_IGN;
 	(void)sigemptyset(&ign.sa_mask);
@@ -268,19 +291,21 @@ dsbsu_wait(dsbsu_proc *proc)
 			continue;
 		}
 		if (FD_ISSET(proc->master, &rset)) {
+			FD_CLR(proc->master, &rset);
 			if ((rd = _read(proc->master, buf, bufsz)) == -1) {
 				if (errno == EPIPE)
 					goto cleanup;
 				goto error;
 			} else if (rd == 0) {
 				goto cleanup;
-			} else if (_write(fileno(stdout), buf, rd) == -1) {
+			} else if (_write(proc->fdstdout, buf, rd) == -1) {
 				if (errno == EPIPE)
 					goto cleanup;
 				goto error;
 			}
 		}
 		if (FD_ISSET(fileno(stdin), &rset)) {
+			FD_CLR(fileno(stdin), &rset);
 			if ((rd = _read(fileno(stdin), buf, bufsz)) == -1) {
 				if (errno == EPIPE) {
 					FD_CLR(fileno(stdin), &allset);
@@ -301,6 +326,24 @@ dsbsu_wait(dsbsu_proc *proc)
 			} else if (_write(proc->fdstdin, buf, rd) == -1) {
 				if (errno == EPIPE) {
 					(void)close(proc->fdstdin);
+					goto cleanup;
+				}
+				goto error;
+			}
+		}
+		if (FD_ISSET(proc->fdstdout, &rset)) {
+			if ((rd = _read(proc->fdstdout, buf, bufsz)) == -1) {
+				if (errno == EPIPE) {
+					FD_CLR(proc->fdstdout, &allset);
+					(void)close(proc->fdstdout);
+				} else
+					goto error;
+			} else if (rd == 0) {
+				FD_CLR(proc->fdstdout, &allset);
+				(void)close(proc->fdstdout);
+			} else if (_write(fileno(stdout), buf, rd) == -1) {
+				if (errno == EPIPE) {
+					(void)close(proc->fdstdout);
 					goto cleanup;
 				}
 				goto error;
@@ -391,20 +434,31 @@ _read(int fd, void *buf, size_t len)
 }
 
 static int
-send_pass(int fd, const char *prompt, const char *pass)
+send_pass(dsbsu_proc *proc, const char *prompt, const char *pass)
 {
-	int	n;
+	int	n, maxfd, rfd, wfd;
 	char	nl, ln[SUMAXREBUFSZ];
 	bool	got_prompt;
-	fd_set	rset;
+	fd_set	rset, allset;
 	ssize_t rd, len;
 	struct timeval tv;
 
 	got_prompt = false; nl = '\n'; len = 0;
+	/*
+	 * If neither stdin nor stdout is a terminal "su" will write
+	 * messages to its terminal (master). If stdin is a terminal,
+	 * but stdout is not, "su" will write messages to stdout.
+	 */
+	wfd = rfd = proc->master;
+	FD_ZERO(&allset);
+	maxfd = proc->master > proc->fdstdout ? proc->master : proc->fdstdout;
+	FD_SET(proc->fdstdout, &allset);
+	FD_SET(proc->master, &allset);
+
 	for (;;) {
-		FD_ZERO(&rset); FD_SET(fd, &rset);
+		rset = allset;
 		tv.tv_sec = 10; tv.tv_usec = 0;
-		if ((n = select(fd + 1, &rset, NULL, NULL, &tv)) == -1) {
+		if ((n = select(maxfd + 1, &rset, NULL, NULL, &tv)) == -1) {
 			if (errno == EINTR)
 				continue;
 			ERROR(FATAL_SYSERR, FATAL_SYSERR, false, "select()");
@@ -414,32 +468,41 @@ send_pass(int fd, const char *prompt, const char *pass)
 			ERROR(DSBSU_ETIMEOUT, DSBSU_ETIMEOUT, false,
 			    "'su' timed out");
 		}
-		if ((rd = _read(fd, ln + len, sizeof(ln) - len - 1)) <= 0)
-			return (-1);
+		if (FD_ISSET(proc->master, &rset))
+			rfd = proc->master;
+		else
+			rfd = proc->fdstdout;
+		if ((rd = _read(rfd, ln + len, sizeof(ln) - len - 1)) <= 0) {
+			if (rd == -1) {
+				ERROR(FATAL_SYSERR, FATAL_SYSERR, false,
+				    "read()");
+			}
+			ERROR(DSBSU_EUNEXPECTED, DSBSU_EUNEXPECTED, false,
+				"Unexpected output received");
+		}
 		if (len + rd >= (ssize_t)sizeof(ln)) {
 			ERROR(DSBSU_EUNEXPECTED, DSBSU_EUNEXPECTED, false,
-			    "Unexpected long reply received from 'su'");
+			    "Unexpectedly long reply received from 'su'");
 		}
 		len += rd; ln[len] = '\0';
 		if (!got_prompt) {
 			if (strstr(ln, prompt) != NULL) {
 				(void)usleep(50000);
 				got_prompt = true;
-				if (_write(fd, pass, strlen(pass)) == -1 ||
-				    _write(fd, &nl, 1) == -1) {
+				if (_write(wfd, pass, strlen(pass)) == -1 ||
+				    _write(wfd, &nl, 1) == -1) {
 					ERROR(FATAL_SYSERR, FATAL_SYSERR,
 					    false, "write()");
 				}
-				(void)tcsendbreak(fd, 0);
+				(void)tcsendbreak(wfd, 0);
 			}
 		} else if (strstr(ln, AUTHMSG_FAIL) != NULL) {
 			ERROR(DSBSU_EAUTH, DSBSU_EAUTH, false,
 			    "Wrong password");
-		} else if (strstr(ln, AUTHMSG_SUCCESS) != NULL) {
+		} else if (strstr(ln, AUTHMSG_SUCCESS) != NULL)
 			return (0);
-		}
 	}
-	return (-1);
+	/* NOTREACHED */
 }
 
 static int
@@ -458,7 +521,7 @@ init_tty(dsbsu_proc *proc)
 	struct termios t;
 
 	proc->ttymod = false;
-	if (!isatty(fileno(stdin)))
+	if (!isatty(fileno(stdout)) || !isatty(fileno(stdin)))
 		return (0);
 	if (tcgetattr(fileno(stdin), &t) == -1)
 		ERROR(-1, FATAL_SYSERR, false, "tcgetattr()");
@@ -514,4 +577,3 @@ wait_on_proc(dsbsu_proc *proc, bool retignore)
 	}
 	return (0);
 }
-
