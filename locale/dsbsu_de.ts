@@ -4,34 +4,29 @@
 <context>
     <name>MainWin</name>
     <message>
-        <location filename="../src/mainwin.cpp" line="40"/>
-        <source>Please enter %1&apos; password:</source>
-        <translation>Bitte geben Sie %1&apos; Passwort ein:</translation>
+        <location filename="../src/mainwin.cpp" line="37"/>
+        <source>Please enter the password for user %1</source>
+        <translation>Bitte geben Sie das Passwort für den Benutzer %1 ein</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="42"/>
-        <source>Please enter %1&apos;s password:</source>
-        <translation>Bitte geben Sie %1s Passwort ein:</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwin.cpp" line="54"/>
+        <location filename="../src/mainwin.cpp" line="51"/>
         <source>&amp;Ok</source>
         <translation>&amp;Ok</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="55"/>
+        <location filename="../src/mainwin.cpp" line="52"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="62"/>
+        <location filename="../src/mainwin.cpp" line="59"/>
         <source>Execute &apos;%1&apos; as user %2
 </source>
         <translation>Führe &apos;%1&apos; als Benutzer %2 aus
 </translation>
     </message>
     <message>
-        <location filename="../src/mainwin.cpp" line="116"/>
+        <location filename="../src/mainwin.cpp" line="113"/>
         <source>Wrong password</source>
         <translation>Falsches Passwort</translation>
     </message>
@@ -39,23 +34,23 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/main.cpp" line="70"/>
-        <location filename="../src/main.cpp" line="99"/>
+        <location filename="../src/main.cpp" line="74"/>
+        <location filename="../src/main.cpp" line="103"/>
         <source>No such user %1</source>
         <translation>Unbekannter Benutzer &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="88"/>
+        <location filename="../src/main.cpp" line="92"/>
         <source>Failed to execute command &apos;%1&apos;</source>
         <translation>Konnte Befehl &apos;%1&apos; nicht ausführen</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="102"/>
+        <location filename="../src/main.cpp" line="106"/>
         <source>su timed out</source>
         <translation>Keine Antwort von &apos;su&apos;</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="105"/>
+        <location filename="../src/main.cpp" line="109"/>
         <source>Failed to execute su</source>
         <translation>Konnte &apos;su&apos; nicht ausführen</translation>
     </message>
