@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/mainwin.cpp" line="37"/>
         <source>Please enter the password for user %1</source>
-        <translation>Bitte geben Sie das Passwort für den Benutzer %1 ein</translation>
+        <translation>Bitte geben Sie das Passwort von %1 ein</translation>
     </message>
     <message>
         <location filename="../src/mainwin.cpp" line="51"/>
