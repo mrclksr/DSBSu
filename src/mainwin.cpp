@@ -34,13 +34,9 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
 	this->cmd = cmd;
 	this->usr = usr;
 
-	QString pstring;
-	QString ustr = QString(usr == 0 ? "root" : usr);
-
-	if (ustr[ustr.length() - 1] == 's')
-		pstring = QString(tr("Please enter %1' password:"));
-	else
-		pstring = QString(tr("Please enter %1's password:"));
+	QString pstring	    = QString(tr("Please enter the password for " \
+					 "user %1"));
+	QString ustr	    = QString(usr == 0 ? "root" : usr);
 	QString prompt	    = pstring.arg(ustr);
 	QIcon okIcon	    = qh_loadStockIcon(QStyle::SP_DialogOkButton, 0);
 	QIcon cancelIcon    = qh_loadStockIcon(QStyle::SP_DialogCancelButton,
