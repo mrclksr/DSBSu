@@ -63,7 +63,6 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
 	icon->setPixmap(pic.pixmap(64));
 	text->setWordWrap(true);
 	pwdField->setEchoMode(QLineEdit::Password);
-	statusBar->addWidget(statusMsg);
 	label->setStyleSheet("font-weight: bold;");
 	ok->setDefault(true);
 	cancel->setDefault(true);
@@ -77,8 +76,8 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
 	vbox->addWidget(label,  1, Qt::AlignLeft);
 
 	vbox->addWidget(pwdField);
+	vbox->addWidget(statusMsg);
 	vbox->addLayout(bbox);
-	vbox->addWidget(statusBar);
 	container->setLayout(vbox);
 	setCentralWidget(container);
 
