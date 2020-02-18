@@ -24,6 +24,7 @@
 
 #include <QDesktopWidget>
 #include <QTextCodec>
+#include <QScreen>
 
 #include "mainwin.h"
 #include "qt-helper/qt-helper.h"
@@ -91,7 +92,7 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
 	setWindowTitle("DSBSu");
 	show();
 	setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter,
-	    size(), qApp->desktop()->availableGeometry()));
+	    size(), qApp->primaryScreen()->geometry()));
 	connect(ok, SIGNAL(clicked()), this, SLOT(callBackend()));
 	connect(pwdField, SIGNAL(returnPressed()), this, SLOT(callBackend()));
 	connect(cancel, SIGNAL(clicked()), this, SLOT(cbCancel()));
