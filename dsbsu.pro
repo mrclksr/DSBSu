@@ -10,7 +10,8 @@ isEmpty(DATADIR) {
 
 TARGET	     = $${PROGRAM}
 APPSDIR	     = $${PREFIX}/share/applications
-INSTALLS     = target desktopfile locales
+INSTALLS     = target desktopfile locales scripts
+CONFIG	    += nostrip
 TRANSLATIONS = locale/$${PROGRAM}_de.ts \
                locale/$${PROGRAM}_fr.ts
 LANGUAGES    = de
@@ -19,7 +20,6 @@ QT	    += widgets
 INCLUDEPATH += . lib src
 DEFINES     += PROGRAM=\\\"$${PROGRAM}\\\" LOCALE_PATH=\\\"$${DATADIR}\\\"
 LIBS	    += -lutil
-QMAKE_POST_LINK = $(STRIP) $(TARGET)
 QMAKE_EXTRA_TARGETS += distclean cleanqm readme readmemd
 
 HEADERS += lib/libdsbsu.h \
@@ -31,13 +31,17 @@ SOURCES += src/main.cpp \
 	   lib/qt-helper/qt-helper.cpp \
 	   lib/libdsbsu.c
 
-target.files      = $${PROGRAM}         
-target.path       = $${PREFIX}/bin      
+target.files      = $${PROGRAM}
+target.path       = $${PREFIX}/bin
+target.extra	  = strip $${PROGRAM}
 
 desktopfile.path  = $${APPSDIR}         
 desktopfile.files = $${PROGRAM}.desktop 
 
 locales.path = $${DATADIR}
+
+scripts.files	  = dsbsudo dsbsu-askpass
+scripts.path	  = $${PREFIX}/bin
 
 readme.target = readme
 readme.files = readme.mdoc

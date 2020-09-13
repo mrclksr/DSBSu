@@ -37,11 +37,16 @@ int
 main(int argc, char *argv[])
 {
 	int  ch;
+	bool askpass;
 	char *user, *msg, *cmd;
 
+	askpass = false;
 	msg = user = cmd = NULL;
-	while ((ch = getopt(argc, argv, "m:u:h")) != -1)
+	while ((ch = getopt(argc, argv, "am:u:h")) != -1)
 		switch (ch) {
+		case 'a':
+			askpass = true;
+			break;
 		case 'm':
 			msg = optarg;
 			break;
@@ -52,7 +57,7 @@ main(int argc, char *argv[])
 		case 'h':
 			usage();
 	}
-	if (argc - optind == 0)
+	if (!askpass && argc - optind == 0)
 		usage();
 	cmd = argv[optind];
 
@@ -68,6 +73,12 @@ main(int argc, char *argv[])
 		app.installTranslator(&translator);
 	if (getuid() == 0 || geteuid() == 0)
 		qh_errx(NULL, EXIT_FAILURE, "Refusing to run as root");
+
+	if (askpass) {
+		user = dsbsu_get_username();
+		MainWin w(msg, user);
+		return (app.exec());
+	}
 	if (!dsbsu_validate_user(user)) {
 		if (dsbsu_error() == DSBSU_ENOUSER)
 			qh_errx(NULL, EXIT_FAILURE,
@@ -120,8 +131,8 @@ main(int argc, char *argv[])
 static void
 usage()
 {
-	(void)printf("Usage: %s [-m message][-u user] command\n",
-	    PROGRAM);
+	(void)printf("Usage: %s [-m message][-u user] command\n" \
+		     "       %s -a [-m message]\n", PROGRAM, PROGRAM);
 	exit(EXIT_FAILURE);
 }
 

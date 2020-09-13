@@ -124,6 +124,20 @@ dsbsu_is_me(const char *user)
 	return (false);
 }
 
+char *
+dsbsu_get_username()
+{
+	struct passwd *pw;
+	static char username[_POSIX_LOGIN_NAME_MAX];
+
+	errno = 0;
+	pw = getpwuid(getuid()); endpwent();
+	if (pw == NULL)
+		return (NULL);
+	(void)strncpy(username, pw->pw_name, sizeof(username));
+	return (username);
+}
+
 dsbsu_proc *
 dsbsu_exec_su(const char *cmd, const char *user, const char *pass)
 {

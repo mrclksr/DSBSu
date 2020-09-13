@@ -40,6 +40,7 @@ typedef struct dsbsu_proc_s dsbsu_proc;
 __BEGIN_DECLS
 extern int	  dsbsu_error(void);
 extern int	  dsbsu_wait(dsbsu_proc *);
+extern char	  *dsbsu_get_username(void);
 extern bool	  dsbsu_validate_user(const char *);
 extern bool	  dsbsu_is_me(const char *);
 extern dsbsu_proc *dsbsu_exec_su(const char *, const char *, const char *);

@@ -25,6 +25,7 @@
 #include <QDesktopWidget>
 #include <QTextCodec>
 #include <QScreen>
+#include <iostream>
 
 #include "mainwin.h"
 #include "qt-helper/qt-helper.h"
@@ -93,6 +94,77 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
 	connect(cancel, SIGNAL(clicked()), this, SLOT(cbCancel()));
 	connect(pwdField, SIGNAL(textChanged(const QString &)), this,
 	    SLOT(resetStatusBar(const QString &)));
+}
+
+MainWin::MainWin(const char *msg, const char *usr, QWidget *parent)
+	: QMainWindow(parent) {
+	this->usr = usr;
+
+	QString pstring	    = QString(tr("Please enter the password for " \
+					 "user %1"));
+	QString ustr	    = QString(usr == 0 ? "root" : usr);
+	QString prompt	    = pstring.arg(ustr);
+	QIcon okIcon	    = qh_loadStockIcon(QStyle::SP_DialogOkButton, 0);
+	QIcon cancelIcon    = qh_loadStockIcon(QStyle::SP_DialogCancelButton,
+					       NULL);
+	QIcon pic	    = qh_loadIcon("dialog-password", NULL);
+	pwdField	    = new QLineEdit(this);
+	statusMsg	    = new QLabel(this);
+	statusBar	    = new QStatusBar(this);
+	QLabel	    *icon   = new QLabel(this);	      
+	QLabel	    *text;
+	QLabel	    *label  = new QLabel(prompt);
+	QPushButton *ok	    = new QPushButton(okIcon, tr("&Ok"));
+	QPushButton *cancel = new QPushButton(cancelIcon, tr("&Cancel"));
+	QVBoxLayout *vbox   = new QVBoxLayout;
+	QHBoxLayout *bbox   = new QHBoxLayout;
+	QHBoxLayout *hbox   = new QHBoxLayout;
+	QWidget *container  = new QWidget(this);
+
+	text = new QLabel(QString(msg).append("\n"));
+	icon->setPixmap(pic.pixmap(64));
+	text->setWordWrap(true);
+	pwdField->setEchoMode(QLineEdit::Password);
+	label->setStyleSheet("font-weight: bold;");
+	ok->setDefault(true);
+	cancel->setDefault(true);
+
+	bbox->addWidget(ok,     1, Qt::AlignRight);
+        bbox->addWidget(cancel, 0, Qt::AlignRight);
+
+	hbox->addWidget(icon,   0, Qt::AlignLeft);
+	hbox->addWidget(text,   1, Qt::AlignJustify);
+	vbox->addLayout(hbox);
+	vbox->addWidget(label,  1, Qt::AlignLeft);
+
+	vbox->addWidget(pwdField);
+	vbox->addWidget(statusMsg);
+	vbox->addLayout(bbox);
+	container->setLayout(vbox);
+	setCentralWidget(container);
+
+	setMinimumWidth(500);
+	setMaximumWidth(500);
+	setWindowIcon(pic);
+	setWindowTitle("DSBSu");
+	show();
+	setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter,
+	    size(), qApp->primaryScreen()->geometry()));
+	connect(ok, SIGNAL(clicked()), this, SLOT(printPwd()));
+	connect(pwdField, SIGNAL(returnPressed()), this, SLOT(printPwd()));
+	connect(cancel, SIGNAL(clicked()), this, SLOT(cbCancel()));
+	connect(pwdField, SIGNAL(textChanged(const QString &)), this,
+	    SLOT(resetStatusBar(const QString &)));
+}
+
+void
+MainWin::printPwd()
+{
+	QTextCodec *codec = QTextCodec::codecForLocale();
+	QByteArray encstr = codec->fromUnicode(pwdField->text());
+
+	std::cout << encstr.data() << std::endl;
+	QCoreApplication::exit(0);
 }
 
 void
