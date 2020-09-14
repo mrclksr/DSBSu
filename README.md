@@ -26,7 +26,35 @@ and
 
 # USAGE
 
-	Usage: dsbsu [-m message] [-u user] command
-	   -m: Message text.
-	   -u: Username. Default is root.
+**dsbsu**
+\[**-m** *message*]
+\[**-u** *user*]
+*command*  
+**dsbsu**
+**-a**
+\[**-m** *message*]
+|
+**dsbsu-askpass**
+\[**-m** *message*]  
+**dsbsudo**
+\[*sudo options*]
+*command*
+\[*args ...*]
+
+# OPTIONS
+
+**-a**
+
+> Writes the entered password to stdout, and exits.
+
+**-m**
+
+> Shows the given
+> *message*
+> in the password window.
+
+**-u**
+
+> Run the command as the given
+> *user*.
 
