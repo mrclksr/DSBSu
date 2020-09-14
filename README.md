@@ -34,8 +34,7 @@ and
 **-a**
 \[**-m** *message*]
 |
-**dsbsu-askpass**
-\[**-m** *message*]  
+**dsbsu-askpass**  
 **dsbsudo**
 \[*sudo options*]
 *command*
