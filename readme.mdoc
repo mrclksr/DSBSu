@@ -21,9 +21,32 @@ and
 # make && make install
 .Ed
 .Sh USAGE
-.Bd -literal
-Usage: dsbsu [-m message] [-u user] command
-   -m: Message text.
-   -u: Username. Default is root.
-.Ed
+.Nm dsbsu
+.Op Fl m Ar message
+.Op Fl u Ar user
+.Ar command
+.br
+.Nm dsbsu
+.Fl a
+.Op Fl m Ar message
+|
+.Nm dsbsu-askpass
+.Op Fl m Ar message
+.br
+.Nm dsbsudo
+.Op Ar sudo options
+.Ar command
+.Op Ar args ...
+
+.Sh OPTIONS
+.Bl -tag -width indent
+.It Fl a
+Writes the entered password to stdout, and exits.
+.It Fl m
+Shows the given
+.Ar message
+in the password window.
+.It Fl u
+Run the command as the given
+.Ar user .
 
