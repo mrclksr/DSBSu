@@ -14,13 +14,12 @@ INSTALLS     = target desktopfile locales scripts
 CONFIG	    += nostrip
 TRANSLATIONS = locale/$${PROGRAM}_de.ts \
                locale/$${PROGRAM}_fr.ts
-LANGUAGES    = de
 TEMPLATE     = app
 QT	    += widgets
 INCLUDEPATH += . lib src
 DEFINES     += PROGRAM=\\\"$${PROGRAM}\\\" LOCALE_PATH=\\\"$${DATADIR}\\\"
 LIBS	    += -lutil
-QMAKE_EXTRA_TARGETS += distclean cleanqm readme readmemd
+QMAKE_EXTRA_TARGETS += distclean cleanqm readme readmemd scripts cleanscripts
 
 HEADERS += lib/libdsbsu.h \
 	   lib/qt-helper/qt-helper.h \
@@ -31,17 +30,21 @@ SOURCES += src/main.cpp \
 	   lib/qt-helper/qt-helper.cpp \
 	   lib/libdsbsu.c
 
+qtPrepareTool(LRELEASE, lrelease)
+for(a, TRANSLATIONS) {
+	cmd = $$LRELEASE $${a}
+	system($$cmd)
+}
+
+system(sed -E \'s|@INSTALLDIR@|$${PREFIX}/bin|g\' \
+	< dsbsudo.in > dsbsudo; chmod 755 dsbsudo)
+
 target.files      = $${PROGRAM}
 target.path       = $${PREFIX}/bin
 target.extra	  = strip $${PROGRAM}
 
-desktopfile.path  = $${APPSDIR}         
+desktopfile.path  = $${APPSDIR}
 desktopfile.files = $${PROGRAM}.desktop 
-
-locales.path = $${DATADIR}
-
-scripts.files	  = dsbsudo dsbsu-askpass
-scripts.path	  = $${PREFIX}/bin
 
 readme.target = readme
 readme.files = readme.mdoc
@@ -55,14 +58,13 @@ readmemd.files = readme.mdoc
 readmemd.commands = mandoc -mdoc -Tmarkdown readme.mdoc | \
 			sed -e \'1,1d; \$$,\$$d\' > README.md
 
-qtPrepareTool(LRELEASE, lrelease)
-for(a, LANGUAGES) {
-	in  = locale/$${PROGRAM}_$${a}.ts
-	out = locale/$${PROGRAM}_$${a}.qm
-	locales.files += $$out
-	cmd = $$LRELEASE $$in -qm $$out
-	system($$cmd)
-}
-cleanqm.commands  = rm -f $${locales.files}
-distclean.depends = cleanqm
+locales.path   = $${DATADIR}
+locales.files += locale/*.qm
+
+scripts.path  = $${PREFIX}/bin
+scripts.files = dsbsudo dsbsu-askpass
+
+cleanqm.commands  = rm -f $${locales.files} 
+cleanscripts.commands = rm -f dsbsudo
+distclean.depends = cleanqm cleanscripts
 

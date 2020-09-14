@@ -1,3 +1,0 @@
-#!/bin/sh
-
-SUDO_ASKPASS=dsbsu-askpass sudo -A $*
