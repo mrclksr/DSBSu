@@ -96,7 +96,7 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
 	    SLOT(resetStatusBar(const QString &)));
 }
 
-MainWin::MainWin(const char *msg, const char *usr, QWidget *parent)
+MainWin::MainWin(const char *cmd, const char *usr, QWidget *parent)
 	: QMainWindow(parent) {
 	this->usr = usr;
 
@@ -121,9 +121,9 @@ MainWin::MainWin(const char *msg, const char *usr, QWidget *parent)
 	QHBoxLayout *hbox   = new QHBoxLayout;
 	QWidget *container  = new QWidget(this);
 
-	text = new QLabel(QString(msg).append("\n"));
+	text = new QLabel(tr("<qt>The command \"<tt>%1</tt>\" " \
+			     "requires authentication\n</qt>").arg(cmd));
 	icon->setPixmap(pic.pixmap(64));
-	text->setWordWrap(true);
 	pwdField->setEchoMode(QLineEdit::Password);
 	label->setStyleSheet("font-weight: bold;");
 	ok->setDefault(true);
@@ -133,7 +133,7 @@ MainWin::MainWin(const char *msg, const char *usr, QWidget *parent)
         bbox->addWidget(cancel, 0, Qt::AlignRight);
 
 	hbox->addWidget(icon,   0, Qt::AlignLeft);
-	hbox->addWidget(text,   1, Qt::AlignJustify);
+	hbox->addWidget(text,   1, Qt::AlignLeft);
 	vbox->addLayout(hbox);
 	vbox->addWidget(label,  1, Qt::AlignLeft);
 
@@ -144,7 +144,6 @@ MainWin::MainWin(const char *msg, const char *usr, QWidget *parent)
 	setCentralWidget(container);
 
 	setMinimumWidth(500);
-	setMaximumWidth(500);
 	setWindowIcon(pic);
 	setWindowTitle("DSBSu");
 	show();

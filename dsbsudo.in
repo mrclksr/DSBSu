@@ -1,3 +1,4 @@
 #!/bin/sh
 
-SUDO_ASKPASS=@INSTALLDIR@/dsbsu-askpass sudo -A $*
+export DSBSUDO_CMD="sudo $*"
+SUDO_ASKPASS=@INSTALLDIR@/dsbsudo-askpass sudo -A $*

@@ -1,3 +1,8 @@
 #!/bin/sh
 
-dsbsu -a
+if [ -n "${DSBSUDO_CMD}" ]; then
+	dsbsu -a -c "${DSBSUDO_CMD}"
+else
+	dsbsu -a
+fi
+

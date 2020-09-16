@@ -28,9 +28,7 @@ and
 .br
 .Nm dsbsu
 .Fl a
-.Op Fl m Ar message
-|
-.Nm dsbsu-askpass
+.Op Fl c Ar command
 .br
 .Nm dsbsudo
 .Op Ar sudo options
@@ -41,6 +39,10 @@ and
 .Bl -tag -width indent
 .It Fl a
 Writes the entered password to stdout, and exits.
+.It Fl c
+Shows the given
+.Ar command
+string in the password window.
 .It Fl m
 Shows the given
 .Ar message

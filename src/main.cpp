@@ -42,10 +42,13 @@ main(int argc, char *argv[])
 
 	askpass = false;
 	msg = user = cmd = NULL;
-	while ((ch = getopt(argc, argv, "am:u:h")) != -1)
+	while ((ch = getopt(argc, argv, "ac:m:u:h")) != -1)
 		switch (ch) {
 		case 'a':
 			askpass = true;
+			break;
+		case 'c':
+			cmd = optarg;
 			break;
 		case 'm':
 			msg = optarg;
@@ -59,8 +62,10 @@ main(int argc, char *argv[])
 	}
 	if (!askpass && argc - optind == 0)
 		usage();
-	cmd = argv[optind];
-
+	if (askpass && msg != NULL)
+		usage();
+	if (!askpass)
+		cmd = argv[optind];
 	QApplication app(argc, argv);
 	QTranslator translator;
 
@@ -76,7 +81,7 @@ main(int argc, char *argv[])
 
 	if (askpass) {
 		user = dsbsu_get_username();
-		MainWin w(msg, user);
+		MainWin w(cmd, user);
 		return (app.exec());
 	}
 	if (!dsbsu_validate_user(user)) {
@@ -132,7 +137,7 @@ static void
 usage()
 {
 	(void)printf("Usage: %s [-m message][-u user] command\n" \
-		     "       %s -a [-m message]\n", PROGRAM, PROGRAM);
+		     "       %s -a [-c command]\n", PROGRAM, PROGRAM);
 	exit(EXIT_FAILURE);
 }
 
