@@ -62,7 +62,7 @@ locales.path   = $${DATADIR}
 locales.files += locale/*.qm
 
 scripts.path  = $${PREFIX}/bin
-scripts.files = dsbsudo dsbsu-askpass
+scripts.files = dsbsudo dsbsudo-askpass
 
 cleanqm.commands  = rm -f $${locales.files} 
 cleanscripts.commands = rm -f dsbsudo
