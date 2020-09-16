@@ -54,6 +54,11 @@ and
 
 **-u**
 
-> Run the command as the given
+> Runs the
+> *command*
+> as the given
 > *user*.
+> If
+> **-u**
+> is not defined, root is assumed.
 
