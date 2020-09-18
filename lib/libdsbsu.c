@@ -162,14 +162,15 @@ dsbsu_exec_su(const char *cmd, const char *user, const char *pass)
 	proc->ttymod = false;
 
 	/*
-	 * We can tell whether authentication failed, but not
-	 * if it was successful. Prepend an "/bin/echo" that outputs
-	 * a string to indicate success.
+	 * We can tell whether authentication failed, but not if it was
+	 * successful. The helper program will only be executed if
+	 * authentication was successful, and it outputs the string
+	 * defined in AUTHMSG_SUCCESS.
 	 */
 	if ((cmdbuf = malloc(strlen(cmd) +
-	    sizeof(AUTHMSG_SUCCESS) + strlen("/bin/echo \"\";"))) == NULL)
+	    sizeof(PATH_DSBSU_HELPER) + 8)) == NULL)
 		ERROR(NULL, FATAL_SYSERR, false, "malloc()");
-	(void)sprintf(cmdbuf, "/bin/echo \"%s\";%s", AUTHMSG_SUCCESS, cmd);
+	(void)sprintf(cmdbuf, "%s %s", PATH_DSBSU_HELPER, cmd);
 	(void)sigemptyset(&sset);
         (void)sigaddset(&sset, SIGCHLD);
 	(void)sigprocmask(SIG_BLOCK, &sset, &proc->sset);

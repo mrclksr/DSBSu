@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "4a6e03e670e39ebe649fbfdb64bb14e0"
+exec $*
+

@@ -9,8 +9,9 @@ isEmpty(DATADIR) {
 }                   
 
 TARGET	     = $${PROGRAM}
+HELPER	     = $${PREFIX}/libexec/dsbsu-helper
 APPSDIR	     = $${PREFIX}/share/applications
-INSTALLS     = target desktopfile locales dsbsudo askpass
+INSTALLS     = target desktopfile locales dsbsudo askpass helper
 CONFIG	    += nostrip
 TRANSLATIONS = locale/$${PROGRAM}_de.ts \
                locale/$${PROGRAM}_fr.ts
@@ -18,6 +19,7 @@ TEMPLATE     = app
 QT	    += widgets
 INCLUDEPATH += . lib src
 DEFINES     += PROGRAM=\\\"$${PROGRAM}\\\" LOCALE_PATH=\\\"$${DATADIR}\\\"
+DEFINES	    += PATH_DSBSU_HELPER=\\\"$${HELPER}\\\"
 LIBS	    += -lutil
 QMAKE_EXTRA_TARGETS += distclean cleanqm readme readmemd \
 		       dsbsudo askpass cleanscripts
@@ -67,6 +69,9 @@ dsbsudo.files = dsbsudo
 
 askpass.path  = $${PREFIX}/libexec
 askpass.files = dsbsudo-askpass
+
+helper.path   = $${PREFIX}/libexec
+helper.files  = dsbsu-helper
 
 cleanqm.commands  = rm -f $${locales.files} 
 cleanscripts.commands = rm -f dsbsudo
