@@ -10,7 +10,7 @@ isEmpty(DATADIR) {
 
 TARGET	     = $${PROGRAM}
 APPSDIR	     = $${PREFIX}/share/applications
-INSTALLS     = target desktopfile locales scripts
+INSTALLS     = target desktopfile locales dsbsudo askpass
 CONFIG	    += nostrip
 TRANSLATIONS = locale/$${PROGRAM}_de.ts \
                locale/$${PROGRAM}_fr.ts
@@ -19,7 +19,8 @@ QT	    += widgets
 INCLUDEPATH += . lib src
 DEFINES     += PROGRAM=\\\"$${PROGRAM}\\\" LOCALE_PATH=\\\"$${DATADIR}\\\"
 LIBS	    += -lutil
-QMAKE_EXTRA_TARGETS += distclean cleanqm readme readmemd scripts cleanscripts
+QMAKE_EXTRA_TARGETS += distclean cleanqm readme readmemd \
+		       dsbsudo askpass cleanscripts
 
 HEADERS += lib/libdsbsu.h \
 	   lib/qt-helper/qt-helper.h \
@@ -36,7 +37,7 @@ for(a, TRANSLATIONS) {
 	system($$cmd)
 }
 
-system(sed -E \'s|@INSTALLDIR@|$${PREFIX}/bin|g\' \
+system(sed -E \'s|@INSTALLDIR@|$${PREFIX}/libexec/bin|g\' \
 	< dsbsudo.in > dsbsudo; chmod 755 dsbsudo)
 
 target.files      = $${PROGRAM}
@@ -61,8 +62,11 @@ readmemd.commands = mandoc -mdoc -Tmarkdown readme.mdoc | \
 locales.path   = $${DATADIR}
 locales.files += locale/*.qm
 
-scripts.path  = $${PREFIX}/bin
-scripts.files = dsbsudo dsbsudo-askpass
+dsbsudo.path  = $${PREFIX}/bin
+dsbsudo.files = dsbsudo
+
+askpass.path  = $${PREFIX}/libexec/bin
+askpass.files = dsbsudo-askpass
 
 cleanqm.commands  = rm -f $${locales.files} 
 cleanscripts.commands = rm -f dsbsudo
