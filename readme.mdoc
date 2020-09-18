@@ -2,7 +2,8 @@
 .Dt DSBSu
 .Sh ABOUT
 .Nm DSBSu
-is a Qt frontend to su(1).
+is a Qt frontend to
+.Xr su 1 .
 .Sh INSTALLATION
 .Ss Dependencies
 .Nm
@@ -34,7 +35,15 @@ and
 .Op Ar sudo options
 .Ar command
 .Op Ar args ...
-
+.Sh DESCRIPTION
+.Nm dsbsu
+is a Qt front-end which allows executing commands as another user using
+.Xr su 1 .
+.Nm dsbsudo
+is a wrapper script for
+.Xr sudo 8 which uses
+.Nm dsbsu
+for asking for a password if necessary.
 .Sh OPTIONS
 .Bl -tag -width indent
 .It Fl a

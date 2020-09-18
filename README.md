@@ -2,7 +2,8 @@
 # ABOUT
 
 **DSBSu**
-is a Qt frontend to su(1).
+is a Qt frontend to
+su(1).
 
 # INSTALLATION
 
@@ -32,19 +33,34 @@ and
 *command*  
 **dsbsu**
 **-a**
-\[**-m** *message*]
-|
-**dsbsu-askpass**  
+\[**-c** *command*]  
 **dsbsudo**
 \[*sudo options*]
 *command*
 \[*args ...*]
+
+# DESCRIPTION
+
+**dsbsu**
+is a Qt front-end which allows executing commands as another user using
+su(1).
+**dsbsudo**
+is a wrapper script for
+sudo(8) which uses
+**dsbsu**
+for asking for a password if necessary.
 
 # OPTIONS
 
 **-a**
 
 > Writes the entered password to stdout, and exits.
+
+**-c**
+
+> Shows the given
+> *command*
+> string in the password window.
 
 **-m**
 
