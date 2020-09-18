@@ -37,7 +37,7 @@ for(a, TRANSLATIONS) {
 	system($$cmd)
 }
 
-system(sed -E \'s|@INSTALLDIR@|$${PREFIX}/libexec/bin|g\' \
+system(sed -E \'s|@INSTALLDIR@|$${PREFIX}/libexec|g\' \
 	< dsbsudo.in > dsbsudo; chmod 755 dsbsudo)
 
 target.files      = $${PROGRAM}
@@ -65,7 +65,7 @@ locales.files += locale/*.qm
 dsbsudo.path  = $${PREFIX}/bin
 dsbsudo.files = dsbsudo
 
-askpass.path  = $${PREFIX}/libexec/bin
+askpass.path  = $${PREFIX}/libexec
 askpass.files = dsbsudo-askpass
 
 cleanqm.commands  = rm -f $${locales.files} 
