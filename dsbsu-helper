@@ -1,5 +1,8 @@
 #!/bin/sh
 
 echo "4a6e03e670e39ebe649fbfdb64bb14e0"
-exec $*
-
+while [ $# -gt 0 ]; do
+	args="${args} \"$1\""
+	shift
+done
+eval exec $args
