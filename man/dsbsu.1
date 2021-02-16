@@ -1,0 +1,49 @@
+.Dd $Mdocdate$
+.Dt DSBSu 1
+.Os
+.Sh NAME
+.Nm dsbsu
+.Nd Qt front-end to su(1)
+.Sh SYNOPSIS
+.Nm dsbsu
+.Op Fl m Ar message
+.Op Fl u Ar user
+.Ar command
+.Nm dsbsu
+.Fl a
+.Op Fl c Ar command
+.Nm dsbsudo
+.Op Ar sudo options
+.Ar command
+.Op Ar args ...
+.Sh DESCRIPTION
+.Nm DSBSu
+is a Qt front-end which allows executing commands as another user using
+.Xr su 1 .
+.Nm dsbsudo
+is a wrapper script for
+.Xr sudo 8
+which uses
+.Nm dsbsu
+for asking for a password if necessary.
+.Sh OPTIONS
+.Bl -tag -width indent
+.It Fl a
+Writes the entered password to stdout, and exits.
+.It Fl c
+Shows the given
+.Ar command
+string in the password window.
+.It Fl m
+Shows the given
+.Ar message
+in the password window.
+.It Fl u
+Runs the
+.Ar command
+as the given
+.Ar user .
+If
+.Fl u
+is not defined, root is assumed.
+
