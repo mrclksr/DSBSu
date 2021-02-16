@@ -11,7 +11,7 @@ isEmpty(DATADIR) {
 TARGET	     = $${PROGRAM}
 HELPER	     = $${PREFIX}/libexec/dsbsu-helper
 APPSDIR	     = $${PREFIX}/share/applications
-INSTALLS     = target desktopfile locales dsbsudo askpass helper
+INSTALLS     = target desktopfile locales dsbsudo askpass helper man
 CONFIG	    += nostrip
 TRANSLATIONS = locale/$${PROGRAM}_de.ts \
                locale/$${PROGRAM}_fr.ts
@@ -21,8 +21,8 @@ INCLUDEPATH += . lib src
 DEFINES     += PROGRAM=\\\"$${PROGRAM}\\\" LOCALE_PATH=\\\"$${DATADIR}\\\"
 DEFINES	    += PATH_DSBSU_HELPER=\\\"$${HELPER}\\\"
 LIBS	    += -lutil
-QMAKE_EXTRA_TARGETS += distclean cleanqm readme readmemd \
-		       dsbsudo askpass cleanscripts
+QMAKE_EXTRA_TARGETS += distclean cleanqm man \
+		       dsbsudo askpass cleanscripts cleanman
 
 HEADERS += lib/libdsbsu.h \
 	   lib/qt-helper/qt-helper.h \
@@ -41,6 +41,7 @@ for(a, TRANSLATIONS) {
 
 system(sed -E \'s|@INSTALLDIR@|$${PREFIX}/libexec|g\' \
 	< dsbsudo.in > dsbsudo; chmod 755 dsbsudo)
+system(cp man/$${PROGRAM}.1 man/dsbsudo.1)
 
 target.files      = $${PROGRAM}
 target.path       = $${PREFIX}/bin
@@ -49,17 +50,8 @@ target.extra	  = strip $${PROGRAM}
 desktopfile.path  = $${APPSDIR}
 desktopfile.files = $${PROGRAM}.desktop 
 
-readme.target = readme
-readme.files = readme.mdoc
-readme.commands = mandoc -mdoc readme.mdoc | perl -e \'foreach (<STDIN>) { \
-		\$$_ =~ s/(.)\x08\1/\$$1/g; \$$_ =~ s/_\x08(.)/\$$1/g; \
-		print \$$_ \
-	}\' | sed \'1,1d; \$$,\$$d\' > README
-
-readmemd.target = readmemd
-readmemd.files = readme.mdoc
-readmemd.commands = mandoc -mdoc -Tmarkdown readme.mdoc | \
-			sed -e \'1,1d; \$$,\$$d\' > README.md
+man.files      = man/$${PROGRAM}.1 man/dsbsudo.1
+man.path       = $${PREFIX}/man/man1
 
 locales.path   = $${DATADIR}
 locales.files += locale/*.qm
@@ -75,5 +67,6 @@ helper.files  = dsbsu-helper
 
 cleanqm.commands  = rm -f $${locales.files} 
 cleanscripts.commands = rm -f dsbsudo
-distclean.depends = cleanqm cleanscripts
+cleanman.commands = rm -f man/dsbsudo.1
+distclean.depends = cleanqm cleanscripts cleanman
 
