@@ -16,8 +16,8 @@ toc::[]
 == About
 
 _DSBSu_ is a Qt front-end which allows executing commands as another user using
-_su_(1). _dsbsudo_ is a wrapper script for _sudo_(8) which uses _dsbsu_ for
-asking for a password if necessary.
+_su_(1). _dsbsudo_ is a wrapper script for _sudo_(8) which uses _dsbsu_ to
+ask for a password if necessary.
 
 image::images/mainwin.png[Main window]
 
