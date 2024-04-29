@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "defs.h"
 #include "qt-helper/qt-helper.h"
 #include "mainwin.h"
 

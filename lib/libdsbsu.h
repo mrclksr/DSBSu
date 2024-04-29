@@ -24,27 +24,28 @@
 
 #ifndef _DSBSU_H_
 #define _DSBSU_H_
+#include <stdbool.h>
 #include <sys/cdefs.h>
 
-#define DSBSU_ERR_FATAL	  (1 << 0)
-#define DSBSU_EAUTH	  (1 << 1)
-#define DSBSU_EEXECCMD	  (1 << 2)
-#define DSBSU_ENOUSER	  (1 << 3)
+#define DSBSU_ERR_FATAL (1 << 0)
+#define DSBSU_EAUTH (1 << 1)
+#define DSBSU_EEXECCMD (1 << 2)
+#define DSBSU_ENOUSER (1 << 3)
 #define DSBSU_EUNEXPECTED (1 << 4)
-#define DSBSU_ETIMEOUT	  (1 << 5)
-#define DSBSU_EEXECSU	  (1 << 7)
-#define DSBSU_ERR_SYS	  (1 << 8)
+#define DSBSU_ETIMEOUT (1 << 5)
+#define DSBSU_EEXECSU (1 << 7)
+#define DSBSU_ERR_SYS (1 << 8)
 
 typedef struct dsbsu_proc_s dsbsu_proc;
 
 __BEGIN_DECLS
-extern int	  dsbsu_error(void);
-extern int	  dsbsu_wait(dsbsu_proc *);
-extern char	  *dsbsu_get_username(void);
-extern bool	  dsbsu_validate_user(const char *);
-extern bool	  dsbsu_is_me(const char *);
+extern int dsbsu_error(void);
+extern int dsbsu_wait(dsbsu_proc *);
+extern char *dsbsu_get_username(void);
+extern bool dsbsu_validate_user(const char *);
+extern bool dsbsu_is_me(const char *);
 extern dsbsu_proc *dsbsu_exec_su(const char *, const char *, const char *);
 extern const char *dsbsu_strerror(void);
 __END_DECLS
 
-#endif	/* !_DSBSU_H_ */
+#endif /* !_DSBSU_H_ */
