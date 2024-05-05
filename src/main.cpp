@@ -74,7 +74,8 @@ int main(int argc, char *argv[]) {
       case -1:
         qh::err(nullptr, EXIT_FAILURE, QString("system(%1)").arg(cmd));
       case 127:
-        qh::errx(nullptr, EXIT_FAILURE, "Failed to execute shell.");
+        qh::errx(nullptr, EXIT_FAILURE,
+                 QObject::tr("Failed to execute shell."));
     }
     return (EXIT_SUCCESS);
   }
