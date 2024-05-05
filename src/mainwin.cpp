@@ -174,18 +174,12 @@ void MainWin::callBackend() {
   auto encoder{QStringEncoder(QStringEncoder::Utf8)};
   QByteArray encstr{encoder(pwdField->text())};
 
-  if ((proc = dsbsu_exec_su(cmd, usr, encstr.data())) == NULL) {
-    if (dsbsu_error() == DSBSU_EAUTH) {
-      pwdField->clear();
-      statusMsg->setText(tr("Wrong password"));
-    } else {
-      close();
-      QCoreApplication::exit(1);
-    }
-  } else {
-    close();
-    QCoreApplication::exit(0);
-  }
+  proc = dsbsu_exec_su(cmd, usr, encstr.data());
+  pwdField->clear();
+  encstr.clear();
+  if (proc != NULL) QCoreApplication::exit(0);
+  if (dsbsu_error() != DSBSU_EAUTH) QCoreApplication::exit(1);
+  statusMsg->setText(tr("Wrong password"));
 }
 
 void MainWin::cbCancel() { QCoreApplication::exit(-1); }
