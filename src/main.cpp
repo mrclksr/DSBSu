@@ -80,8 +80,10 @@ int main(int argc, char *argv[]) {
     return (EXIT_SUCCESS);
   }
   MainWin w(msg, user, cmd);
+  int retCode{app.exec()};
+  w.hide();
 
-  if (app.exec() != -1) {
+  if (retCode != -1) {
     if (w.proc != NULL && dsbsu_wait(w.proc) != 0) {
       if (dsbsu_error() == DSBSU_EEXECCMD) {
         qh::errx(nullptr, EXIT_FAILURE,
