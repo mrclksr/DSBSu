@@ -105,7 +105,7 @@ Let's say you want to add French translations, you can proceed as follows:
 ----
 % git clone url-of-your-fork
 ----
-. Install https://www.freshports.org/devel/qt5-linguist[devel/qt5-linguist]
+. Install https://www.freshports.org/devel/qt6-tools/[devel/qt6-tools]
 . `cd` to `your-forked-dsbsu-dir`
 . Add `locale/dsbsu_fr.ts` to the `TS_FILES` list in `CMakeLists.txt`.
 . In order to create the `dsbsu_fr.ts` file, run
@@ -116,7 +116,7 @@ Let's say you want to add French translations, you can proceed as follows:
 % cmake -S . -B build
 % cmake --build build -t dsbsu_lupdate
 ----
-. Run `linguist locale/dsbsu_fr.ts`
+. Run `linguist6 locale/dsbsu_fr.ts`
 . Add the file to the repo: `git add locale/dsbsu_fr.ts`
 . Commit: `git commit -am 'Add French translations.'`
 . Send a pull request.
