@@ -40,5 +40,5 @@ class MainWin : public QMainWindow {
   QLabel *statusMsg;
   QStatusBar *statusBar;
   QLineEdit *pwdField;
-  const char *cmd, *usr, *pass;
+  const char *cmd, *usr;
 };
