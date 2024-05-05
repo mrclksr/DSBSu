@@ -26,6 +26,7 @@
 
 #include <QScreen>
 #include <QStringConverter>
+#include <QApplication>
 #include <iostream>
 
 #include "qt-helper/qt-helper.h"
@@ -41,9 +42,9 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
                  "user %1"));
   QString ustr = QString(usr == 0 ? "root" : usr);
   QString prompt = pstring.arg(ustr);
-  QIcon okIcon = qh_loadStockIcon(QStyle::SP_DialogOkButton, 0);
-  QIcon cancelIcon = qh_loadStockIcon(QStyle::SP_DialogCancelButton, NULL);
-  QIcon pic = qh_loadIcon("dialog-password", NULL);
+  QIcon okIcon{qh::loadStockIcon(QStyle::SP_DialogOkButton)};
+  QIcon cancelIcon{qh::loadStockIcon(QStyle::SP_DialogCancelButton)};
+  QIcon pic{qh::loadIcon(QStringList("dialog-password"))};
   pwdField = new QLineEdit(this);
   statusMsg = new QLabel(this);
   statusBar = new QStatusBar(this);
@@ -106,9 +107,9 @@ MainWin::MainWin(const char *cmd, const char *usr, QWidget *parent)
                  "user %1"));
   QString ustr = QString(usr == 0 ? "root" : usr);
   QString prompt = pstring.arg(ustr);
-  QIcon okIcon = qh_loadStockIcon(QStyle::SP_DialogOkButton, 0);
-  QIcon cancelIcon = qh_loadStockIcon(QStyle::SP_DialogCancelButton, NULL);
-  QIcon pic = qh_loadIcon("dialog-password", NULL);
+  QIcon okIcon{qh::loadStockIcon(QStyle::SP_DialogOkButton)};
+  QIcon cancelIcon{qh::loadStockIcon(QStyle::SP_DialogCancelButton)};
+  QIcon pic{qh::loadIcon(QStringList("dialog-password"))};
   pwdField = new QLineEdit(this);
   statusMsg = new QLabel(this);
   statusBar = new QStatusBar(this);

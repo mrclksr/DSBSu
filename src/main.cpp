@@ -24,6 +24,7 @@
 
 #include <QLocale>
 #include <QTranslator>
+#include <QApplication>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -78,7 +79,7 @@ main(int argc, char *argv[])
 	    QLatin1String("_"), QLatin1String(LOCALE_PATH)))
 		app.installTranslator(&translator);
 	if (getuid() == 0 || geteuid() == 0)
-		qh_errx(NULL, EXIT_FAILURE, "Refusing to run as root");
+		qh::errx(nullptr, EXIT_FAILURE, "Refusing to run as root");
 
 	if (askpass) {
 		user = dsbsu_get_username();
@@ -87,16 +88,16 @@ main(int argc, char *argv[])
 	}
 	if (!dsbsu_validate_user(user)) {
 		if (dsbsu_error() == DSBSU_ENOUSER)
-			qh_errx(NULL, EXIT_FAILURE,
+			qh::errx(nullptr, EXIT_FAILURE,
 			    QObject::tr("No such user %1").arg(user));
-		qh_errx(NULL, EXIT_FAILURE, "%s", dsbsu_strerror());
+		qh::errx(nullptr, EXIT_FAILURE, QString(dsbsu_strerror()));
 	}
 	if (dsbsu_is_me(user)) {
 		switch (system(cmd)) {
 		case  -1:
-			qh_err(NULL, EXIT_FAILURE, "system(%s)", cmd);
+			qh::err(nullptr, EXIT_FAILURE, QString("system(%1)").arg(cmd));
 		case 127:
-			qh_errx(NULL, EXIT_FAILURE, "Failed to execute shell.");
+			qh::errx(nullptr, EXIT_FAILURE, "Failed to execute shell.");
 		}
 		return (EXIT_SUCCESS);
 	}
@@ -105,28 +106,26 @@ main(int argc, char *argv[])
 	if (app.exec() != -1) {
 		if (w.proc != NULL && dsbsu_wait(w.proc) != 0) {
 			if (dsbsu_error() == DSBSU_EEXECCMD) {
-				qh_errx(NULL, EXIT_FAILURE,
+				qh::errx(nullptr, EXIT_FAILURE,
 				    QObject::tr(
 					"Failed to execute command '%1'"
 				    ).arg(cmd));
 			} else {
-				qh_errx(NULL, EXIT_FAILURE, "%s",
-				    dsbsu_strerror());
+				qh::errx(nullptr, EXIT_FAILURE, QString(dsbsu_strerror()));
 			}
 		} else if (w.proc == NULL) {
 			switch (dsbsu_error()) {
 			case DSBSU_ENOUSER:
-				qh_errx(NULL, EXIT_FAILURE,
+				qh::errx(nullptr, EXIT_FAILURE,
 				   QObject::tr("No such user %1").arg(user));
 			case DSBSU_ETIMEOUT:
-				qh_errx(NULL, EXIT_FAILURE,
+				qh::errx(nullptr, EXIT_FAILURE,
 				QObject::tr("su timed out"));
 			case DSBSU_EEXECSU:
-				qh_errx(NULL, EXIT_FAILURE,
+				qh::errx(nullptr, EXIT_FAILURE,
 				    QObject::tr("Failed to execute su"));
 			default:
-				qh_errx(NULL, EXIT_FAILURE, "%s",
-				    dsbsu_strerror());
+				qh::errx(nullptr, EXIT_FAILURE, QString(dsbsu_strerror()));
 			}
 		}
 		return (EXIT_SUCCESS);
