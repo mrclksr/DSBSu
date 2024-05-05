@@ -16,10 +16,7 @@
 
 MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
                  QWidget *parent)
-    : QMainWindow(parent) {
-  this->cmd = cmd;
-  this->usr = usr;
-
+    : QMainWindow(parent), cmd{cmd}, usr{usr} {
   QString pstring =
       QString(tr("Please enter the password for "
                  "user %1"));
@@ -82,9 +79,7 @@ MainWin::MainWin(const char *msg, const char *usr, const char *cmd,
 }
 
 MainWin::MainWin(const char *cmd, const char *usr, QWidget *parent)
-    : QMainWindow(parent) {
-  this->usr = usr;
-
+    : QMainWindow(parent), usr{usr} {
   QString pstring =
       QString(tr("Please enter the password for "
                  "user %1"));
