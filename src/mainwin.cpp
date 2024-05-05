@@ -163,6 +163,8 @@ void MainWin::printPwd() {
   QByteArray encstr{encoder(pwdField->text())};
 
   std::cout << encstr.data() << std::endl;
+  pwdField->clear();
+  encstr.clear();
   QCoreApplication::exit(0);
 }
 
