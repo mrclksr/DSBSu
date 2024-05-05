@@ -48,6 +48,7 @@ private slots:
 	void resetStatusBar(const QString &);
 	void closeEvent(QCloseEvent *);
 	void printPwd(void);
+	void clearInput(QLineEdit *);
 public:
 	dsbsu_proc *proc = 0;
 private:

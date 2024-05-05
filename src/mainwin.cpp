@@ -7,9 +7,9 @@
 
 #include "mainwin.h"
 
+#include <QApplication>
 #include <QScreen>
 #include <QStringConverter>
-#include <QApplication>
 #include <iostream>
 
 #include "qt-helper/qt-helper.h"
@@ -142,7 +142,7 @@ void MainWin::printPwd() {
   QByteArray encstr{encoder(pwdField->text())};
 
   std::cout << encstr.data() << std::endl;
-  pwdField->clear();
+  clearInput(pwdField);
   encstr.clear();
   QCoreApplication::exit(0);
 }
@@ -156,15 +156,25 @@ void MainWin::callBackend() {
   QByteArray encstr{encoder(pwdField->text())};
 
   proc = dsbsu_exec_su(cmd, usr, encstr.data());
-  pwdField->clear();
+  clearInput(pwdField);
   encstr.clear();
   if (proc != NULL) QCoreApplication::exit(0);
   if (dsbsu_error() != DSBSU_EAUTH) QCoreApplication::exit(1);
   statusMsg->setText(tr("Wrong password"));
 }
 
-void MainWin::cbCancel() { QCoreApplication::exit(-1); }
+void MainWin::cbCancel() {
+  clearInput(pwdField);
+  QCoreApplication::exit(-1);
+}
 
 void MainWin::closeEvent(QCloseEvent * /* unused */) {
+  clearInput(pwdField);
   QCoreApplication::exit(-1);
+}
+
+void MainWin::clearInput(QLineEdit *input) {
+  QString s;
+  input->setText(s.fill(' ', 80));
+  input->clear();
 }
