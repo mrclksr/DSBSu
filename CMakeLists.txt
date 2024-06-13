@@ -62,6 +62,7 @@ add_custom_command(
 )
 add_custom_target(build_dsbsudo ALL DEPENDS "dsbsudo")
 
+install(DIRECTORY COMPONENT DESTINATION "man/man1")
 install(TARGETS dsbsu DESTINATION bin)
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/dsbsudo DESTINATION bin)
 install(PROGRAMS dsbsudo-askpass DESTINATION libexec)
